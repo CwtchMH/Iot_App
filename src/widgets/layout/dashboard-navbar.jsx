@@ -2,11 +2,11 @@ import { useLocation, Link } from "react-router-dom";
 import {
   Navbar,
   Typography,
-  Button,
+  Option,
   IconButton,
   Breadcrumbs,
   Input,
-  Select
+  Select,
 } from "@material-tailwind/react";
 import {
   UserCircleIcon,
@@ -24,7 +24,7 @@ import {
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
-  const { fixedNavbar, openSidenav } = controller;
+  const { fixedNavbar } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
 
@@ -84,14 +84,6 @@ export function DashboardNavbar() {
               <Input label="Search" />
             </div>
           </div>
-          <IconButton
-            variant="text"
-            color="blue-gray"
-            className="grid xl:hidden"
-            onClick={() => setOpenSidenav(dispatch, !openSidenav)}
-          >
-            <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
-          </IconButton>
           <IconButton
             variant="text"
             color="blue-gray"
