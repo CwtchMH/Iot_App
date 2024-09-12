@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -7,10 +8,38 @@ import {
 } from "@material-tailwind/react";
 import { authorsTableData } from "@/data";
 import { CircularPagination } from "@/components/Pagination";
-import { Select, Option } from "@material-tailwind/react";
-import { XMarkIcon } from "@heroicons/react/24/solid";
+import { BarsArrowDownIcon, BarsArrowUpIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 
 export function Tables() {
+  const [sortedData, setSortedData] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+
+  useEffect(() => {
+    setSortedData([...authorsTableData]);
+  }, []);
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+
+    const sorted = [...sortedData].sort((a, b) => {
+      if (a[key] < b[key]) return direction === 'ascending' ? -1 : 1;
+      if (a[key] > b[key]) return direction === 'ascending' ? 1 : -1;
+      return 0;
+    });
+    setSortedData(sorted);
+  };
+
+  const getSortIcon = (columnName) => {
+    if (sortConfig.key === columnName) {
+      return sortConfig.direction === 'ascending' ? <BarsArrowUpIcon className="h-4 w-4" /> : <BarsArrowDownIcon className="h-4 w-4" />;
+    }
+    return <ChevronUpDownIcon className="h-4 w-4" />;
+  };
+
   return (
     <div className="mt-12 mb-8 flex flex-col min-h-[650px] justify-between">
       <Card>
@@ -23,28 +52,27 @@ export function Tables() {
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>
-                {["id", "temperature", "humidity", "light", "time"].map(
-                  (el) => (
-                    <th
-                      key={el}
-                      className="border-b border-blue-gray-50 py-3 px-10 text-left"
+                {["id", "temperature", "humidity", "light", "time"].map((el) => (
+                  <th
+                    key={el}
+                    className="border-b border-blue-gray-50 py-3 px-10 text-left cursor-pointer"
+                    onClick={() => requestSort(el)}
+                  >
+                    <Typography
+                      variant="small"
+                      className="text-[11px] text-center font-bold uppercase text-blue-gray-400 flex items-center justify-center"
                     >
-                      <Typography
-                        variant="small"
-                        className="text-[11px] text-center font-bold uppercase text-blue-gray-400"
-                      >
-                        {el}
-                      </Typography>
-                    </th>
-                  ),
-                )}
+                      {el} {getSortIcon(el)}
+                    </Typography>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {authorsTableData.map(
+              {sortedData.map(
                 ({ id, temperature, humidity, light, time }, key) => {
                   const className = `py-3 px-10 ${
-                    key === authorsTableData.length - 1
+                    key === sortedData.length - 1
                       ? ""
                       : "border-b border-blue-gray-50"
                   }`;
@@ -88,33 +116,13 @@ export function Tables() {
                       </td>
                     </tr>
                   );
-                },
+                }
               )}
             </tbody>
           </table>
         </CardBody>
       </Card>
       <div className="mt-4">
-        <div className="flex flex-row justify-center gap-44">
-          <div className="w-10">
-            <Select label="Type">
-              <Option value="temperature">Temperature</Option>
-              <Option value="humidity">Humidity</Option>
-              <Option value="light">Light</Option>
-            </Select>
-          </div>
-          <div className="w-10 mx-1">
-            <Select label="Condition">
-              <Option>Trên 40°C</Option>
-              <Option>Từ 20°C đến 40°C</Option>
-              <Option>Dưới 20°C</Option>
-            </Select>
-          </div>
-          <Button className="h-10 w-28 flex items-center flex-row">
-            <XMarkIcon strokeWidth={2} className="h-6 w-6" />
-            Reset
-          </Button>
-        </div>
         <div className="flex justify-center mt-3">
           <CircularPagination />
         </div>

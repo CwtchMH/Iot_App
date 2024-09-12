@@ -6,11 +6,7 @@ import {
   IconButton,
   Breadcrumbs,
   Input,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Avatar,
+  Select
 } from "@material-tailwind/react";
 import {
   UserCircleIcon,
@@ -71,9 +67,22 @@ export function DashboardNavbar() {
             {page}
           </Typography>
         </div>
-        <div className="flex items-center">
-          <div className={`mr-auto md:mr-4 md:w-56 ${page === 'home' || page === 'profile' ? 'hidden' : 'visible'}`}>
-            <Input label="Search" />
+        <div className="flex justify-end w-[40%] gap-36">
+          <div
+            className={`mr-auto md:mr-4 md:w-64 ${
+              page === "home" || page === "profile" ? "hidden" : "visible"
+            } flex flex-row items-center gap-32`}
+          >
+            <div className="w-10 mr-10">
+              <Select label="Type">
+                <Option value="temperature">Temperature</Option>
+                <Option value="humidity">Humidity</Option>
+                <Option value="light">Light</Option>
+              </Select>
+            </div>
+            <div>
+              <Input label="Search" />
+            </div>
           </div>
           <IconButton
             variant="text"
