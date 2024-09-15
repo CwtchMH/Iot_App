@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardHeader,
   CardBody,
   Typography,
-  Button,
 } from "@material-tailwind/react";
-import { activeHistoryData } from "@/data";
-import { CircularPagination } from "@/components/Pagination";
+import { useActiveHistoryData } from "@/data/active-history-data";
+import { Pagination } from "@/components/Pagination";
 import { BarsArrowDownIcon, BarsArrowUpIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 
 export function Notifications() {
   const [sortedData, setSortedData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [ currentPage, setCurrentPage ] = useState(1);
+  const [ pageSize , setPageSize ] = useState(10);
+
+  const { activeHistoryData } = useActiveHistoryData();
 
   useEffect(() => {
     setSortedData([...activeHistoryData]);
@@ -40,6 +43,12 @@ export function Notifications() {
     return <ChevronUpDownIcon className="h-4 w-4" />;
   };
 
+  const currentTableData = useMemo(() => {
+    const firstPageIndex = (currentPage - 1) * pageSize;
+    const lastPageIndex = firstPageIndex + pageSize;
+    return sortedData.slice(firstPageIndex, lastPageIndex);
+  }, [currentPage, pageSize, sortedData]);
+
   return (
     <div className="mt-12 mb-8 flex flex-col min-h-[650px] justify-between">
       <Card>
@@ -52,7 +61,7 @@ export function Notifications() {
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>
-                {["ID", "Device", "Status", "time"].map((el) => (
+                {["ID", "Device", "DeviceID", "Status", "time"].map((el) => (
                   <th
                     key={el}
                     className="border-b border-blue-gray-50 py-3 px-5 text-left cursor-pointer"
@@ -69,9 +78,9 @@ export function Notifications() {
               </tr>
             </thead>
             <tbody>
-              {sortedData.map(({ id, device, status, time }, key) => {
+              {currentTableData.map(({ _id, id, device, deviceID, status, createdAt, updatedAt }, key) => {
                 const className = `py-3 px-10 ${
-                  key === sortedData.length - 1
+                  key === currentTableData.length - 1
                     ? ""
                     : "border-b border-blue-gray-50"
                 }`;
@@ -98,6 +107,11 @@ export function Notifications() {
                     </td>
                     <td className={className}>
                       <Typography className="text-xs font-bold text-black">
+                        {deviceID}
+                      </Typography>
+                    </td>
+                    <td className={className}>
+                      <Typography className="text-xs font-bold text-black">
                         {status}
                       </Typography>
                     </td>
@@ -107,7 +121,7 @@ export function Notifications() {
                         href="#"
                         className="text-xs font-semibold text-blue-gray-600"
                       >
-                        {time}
+                        {createdAt}
                       </Typography>
                     </td>
                   </tr>
@@ -119,7 +133,13 @@ export function Notifications() {
       </Card>
       <div className="mt-4">
         <div className="flex justify-center mt-3">
-          <CircularPagination />
+          <Pagination
+            currentPage={currentPage}
+            totalCount={sortedData.length}
+            pageSize={pageSize}
+            onPageChange={page => setCurrentPage(page)}
+            onPageSizeChange={size => setPageSize(size)}
+          />
         </div>
       </div>
     </div>
