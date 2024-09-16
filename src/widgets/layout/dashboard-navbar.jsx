@@ -9,11 +9,7 @@ import {
   Select,
 } from "@material-tailwind/react";
 import {
-  UserCircleIcon,
   Cog6ToothIcon,
-  BellIcon,
-  ClockIcon,
-  CreditCardIcon,
   Bars3Icon,
 } from "@heroicons/react/24/solid";
 import {
@@ -21,12 +17,27 @@ import {
   setOpenConfigurator,
   setOpenSidenav,
 } from "@/context";
+import { useSearch } from '@/context/SearchContext';
+import { useEffect } from 'react';
 
 export function DashboardNavbar() {
+  const { searchTerm, setSearchTerm, searchType, setSearchType } = useSearch();
+
+  const handleSearchTypeChange = (value) => {
+    setSearchType(value);
+    // Optionally, you can also reset the search term when changing the type
+    setSearchTerm('');
+  };
+
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+
+  useEffect(() => {
+    setSearchTerm('');
+    setSearchType('');
+  }, [page]);
 
   return (
     <Navbar
@@ -74,14 +85,38 @@ export function DashboardNavbar() {
             } flex flex-row items-center gap-32`}
           >
             <div className="w-10 mr-10">
-              <Select label="Type">
-                <Option value="temperature">Temperature</Option>
-                <Option value="humidity">Humidity</Option>
-                <Option value="light">Light</Option>
-              </Select>
+              {page === "data-sensors" && (
+                <Select 
+                  label="Type" 
+                  value={searchType} 
+                  onChange={handleSearchTypeChange}
+                >
+                  <Option value="temperature">Temperature</Option>
+                  <Option value="humidity">Humidity</Option>
+                  <Option value="light">Light</Option>
+                  <Option value="createdAt">Time</Option>
+                </Select>
+              )}
+              {page === "action-history" && (
+                <Select 
+                  label="Type" 
+                  value={searchType} 
+                  onChange={handleSearchTypeChange}
+                >
+                  <Option value="AC">AC</Option>
+                  <Option value="Fan">Fan</Option>
+                  <Option value="Light">Light</Option>
+                  <Option value="createdAt">Time</Option>
+                </Select>
+              )}
             </div>
             <div>
-              <Input label="Search" />
+              <Input
+                type={page === "data-sensors" && searchType !== "createdAt" ? "number" : ""}
+                label="Search" 
+                value={searchTerm} 
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
           <IconButton

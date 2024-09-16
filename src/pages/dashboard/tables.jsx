@@ -1,22 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardHeader,
   CardBody,
   Typography,
-  Button,
 } from "@material-tailwind/react";
-import { authorsTableData } from "@/data";
-import { CircularPagination } from "@/components/Pagination";
 import { BarsArrowDownIcon, BarsArrowUpIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
+import { Pagination } from "@/components/Pagination";
+import { useSensorData } from "@/data/sensorData";
+import { useSearch } from '@/context/SearchContext';
 
 export function Tables() {
+  const { searchTerm, searchType } = useSearch();
+  const { sensorData, error } = useSensorData(searchTerm, searchType);
+
   const [sortedData, setSortedData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    setSortedData([...authorsTableData]);
-  }, []);
+      setSortedData([...sensorData]);
+  }, [sensorData]);
+
+  const currentTableData = useMemo(() => {
+    const firstPageIndex = (currentPage - 1) * pageSize;
+    const lastPageIndex = firstPageIndex + pageSize;
+    return sortedData.slice(firstPageIndex, lastPageIndex);
+  }, [currentPage, pageSize, sortedData]);
 
   const requestSort = (key) => {
     let direction = 'ascending';
@@ -25,12 +36,26 @@ export function Tables() {
     }
     setSortConfig({ key, direction });
 
-    const sorted = [...sortedData].sort((a, b) => {
+    const sortedPageData = [...currentTableData].sort((a, b) => {
       if (a[key] < b[key]) return direction === 'ascending' ? -1 : 1;
       if (a[key] > b[key]) return direction === 'ascending' ? 1 : -1;
       return 0;
     });
-    setSortedData(sorted);
+
+    // Create a new array with all elements from sortedData
+    const newSortedData = [...sortedData];
+    
+    // Calculate the starting index of the current page
+    const firstPageIndex = (currentPage - 1) * pageSize;
+    
+    // Use splice to replace elements in newSortedData:
+    // 1. Start at firstPageIndex
+    // 2. Remove pageSize number of elements
+    // 3. Insert all elements from sortedPageData
+    newSortedData.splice(firstPageIndex, pageSize, ...sortedPageData);
+    
+    // Update the state with the new sorted data
+    setSortedData(newSortedData);
   };
 
   const getSortIcon = (columnName) => {
@@ -39,6 +64,14 @@ export function Tables() {
     }
     return <ChevronUpDownIcon className="h-4 w-4" />;
   };
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!sensorData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="mt-12 mb-8 flex flex-col min-h-[650px] justify-between">
@@ -69,10 +102,10 @@ export function Tables() {
               </tr>
             </thead>
             <tbody>
-              {sortedData.map(
-                ({ id, temperature, humidity, light, time }, key) => {
+              {currentTableData.map(
+                ({ _id, id, temperature, humidity, light, createdAt }, key) => {
                   const className = `py-3 px-10 ${
-                    key === sortedData.length - 1
+                    key === currentTableData.length - 1
                       ? ""
                       : "border-b border-blue-gray-50"
                   }`;
@@ -111,7 +144,7 @@ export function Tables() {
                           href="#"
                           className="text-xs font-semibold text-blue-gray-600"
                         >
-                          {time}
+                          {new Date(createdAt).toLocaleString()}
                         </Typography>
                       </td>
                     </tr>
@@ -124,7 +157,13 @@ export function Tables() {
       </Card>
       <div className="mt-4">
         <div className="flex justify-center mt-3">
-          <CircularPagination />
+          <Pagination
+            currentPage={currentPage}
+            totalCount={sortedData.length}
+            pageSize={pageSize}
+            onPageChange={page => setCurrentPage(page)}
+            onPageSizeChange={size => setPageSize(size)}
+          />
         </div>
       </div>
     </div>

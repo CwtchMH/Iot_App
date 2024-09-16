@@ -1,40 +1,26 @@
-export const activeHistoryData = [
-  {
-    id: "1",
-    device: "AC",
-    status: "On",
-    time: "13:00:01 20/12/2024",
-  },
-  {
-    id: "2",
-    device: "AC",
-    status: "On",
-    time: "14:00:01 20/12/2024",
-  },
-  {
-    id: "3",
-    device: "AC",
-    status: "On",
-    time: "15:00:01 20/12/2024",
-  },
-  {
-    id: "4",
-    device: "Fan",
-    status: "On",
-    time: "08:00:01 20/12/2024",
-  },
-  {
-    id: "5",
-    device: "Light",
-    status: "Off",
-    time: "09:00:01 20/12/2024",
-  },
-  {
-    id: "6",
-    device: "AC",
-    status: "Off",
-    time: "17:00:01 20/12/2024",
-  },
-];
+import { useState, useEffect } from "react";
 
-export default activeHistoryData;
+export function useActiveHistoryData(searchTerm = '', searchType = '') {
+  const [activeHistoryData, setActiveHistoryData] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/devices/devices-status?searchTerm=${searchTerm}&searchType=${searchType}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched active history data:", data);
+        setActiveHistoryData(data);
+      } catch (e) {
+        console.error("Error fetching active history data:", e);
+        setError(e.message);
+      }
+    };
+    fetchData();
+  }, [searchTerm, searchType]);
+
+  return { activeHistoryData, error };
+}
