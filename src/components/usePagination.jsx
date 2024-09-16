@@ -4,15 +4,34 @@ export const DOTS = '...';
 
 const range = (start, end) => {
   let length = end - start + 1;
+  // This line creates an array of numbers from 'start' to 'end' (inclusive)
+  // 1. Array.from() creates a new array from an array-like or iterable object
+  // 2. { length } is an object with a 'length' property, used to create an array of that length
+  // 3. The second argument is a mapping function: (_, idx) => idx + start
+  //    - '_' is a convention for an unused parameter (the array element, which is undefined here)
+  //    - 'idx' is the index of the current element
+  //    - 'idx + start' calculates the actual number for this position in the range
+  // This effectively creates an array of numbers from 'start' to 'end'
+  // The value of idx is the index of the current element in the array being created.
+  // It starts from 0 and goes up to length - 1.
   return Array.from({ length }, (_, idx) => idx + start);
 };
 
+// The usePagination function is a custom hook that calculates the pagination range
+// It takes four parameters:
+// - totalCount: The total number of items to be paginated
+// - pageSize: The number of items per page
+// - siblingCount: The number of page numbers to show on each side of the current page (default is 1)
+// - currentPage: The current active page
 export const usePagination = ({
     totalCount,
     pageSize,
     siblingCount = 1,
     currentPage
   }) => {
+    // The function body continues below...
+    // It uses these parameters to calculate and return an array representing the pagination range,
+    // which includes page numbers and potentially dots (...) for skipped pages
     const paginationRange = useMemo(() => {
       const totalPageCount = Math.ceil(totalCount / pageSize);
   

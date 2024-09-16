@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 
-export function useSensorData() {
+export function useSensorData(searchTerm = '', searchType = '') {
   const [sensorData, setSensorData] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/sensors/sensors-status")
+        const response = await fetch(`http://localhost:3000/sensors/sensors-status?searchTerm=${searchTerm}&searchType=${searchType}`);
         const data = await response.json();
         console.log("Fetched sensor data:", data);
         setSensorData(data);
@@ -18,7 +18,7 @@ export function useSensorData() {
     };
 
     fetchData();
-  }, []);
+  }, [searchTerm, searchType]);
 
   return { sensorData, error };
 }

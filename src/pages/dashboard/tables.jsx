@@ -8,19 +8,19 @@ import {
 import { BarsArrowDownIcon, BarsArrowUpIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Pagination } from "@/components/Pagination";
 import { useSensorData } from "@/data/sensorData";
+import { useSearch } from '@/context/SearchContext';
 
 export function Tables() {
+  const { searchTerm, searchType } = useSearch();
+  const { sensorData, error } = useSensorData(searchTerm, searchType);
+
   const [sortedData, setSortedData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const { sensorData, error } = useSensorData();
-
   useEffect(() => {
-    if (sensorData && sensorData.length > 0) {
       setSortedData([...sensorData]);
-    }
   }, [sensorData]);
 
   const currentTableData = useMemo(() => {
@@ -69,7 +69,7 @@ export function Tables() {
     return <div>Error: {error}</div>;
   }
 
-  if (sortedData.length === 0) {
+  if (!sensorData) {
     return <div>Loading...</div>;
   }
 
@@ -103,7 +103,7 @@ export function Tables() {
             </thead>
             <tbody>
               {currentTableData.map(
-                ({ _id, id, temperature, humidity, light, createdAt, updatedAt }, key) => {
+                ({ _id, id, temperature, humidity, light, createdAt }, key) => {
                   const className = `py-3 px-10 ${
                     key === currentTableData.length - 1
                       ? ""
@@ -144,7 +144,7 @@ export function Tables() {
                           href="#"
                           className="text-xs font-semibold text-blue-gray-600"
                         >
-                          {createdAt}
+                          {new Date(createdAt).toLocaleString()}
                         </Typography>
                       </td>
                     </tr>
