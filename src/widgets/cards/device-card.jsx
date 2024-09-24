@@ -6,28 +6,13 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import PropTypes from "prop-types";
-import {
-  useMaterialTailwindController,
-  setOpenAC,
-  setOpenFan,
-  setOpenLight,
-} from "@/context";
 
-export function DeviceCard({ color, icon, title, value, footer }) {
-  const [controller, dispatch] = useMaterialTailwindController();
-  const { statusAC, statusFan, statusLight } = controller;
+
+export function DeviceCard({ color, icon, title, footer, onClick }) {
   return (
     <Card
       className="border cursor-pointer border-blue-gray-100 flex flex-col max-h-[155px] items-center shadow-md"
-      onClick={() => {
-        if (title === "Light") {
-          setOpenLight(dispatch, !statusLight);
-        } else if (title === "Fan") {
-          setOpenFan(dispatch, !statusFan);
-        } else {
-          setOpenAC(dispatch, !statusAC);
-        }
-      }}
+      onClick={onClick}
     >
       <CardHeader
         variant="gradient"
@@ -81,9 +66,9 @@ DeviceCard.propTypes = {
     "red",
   ]),
   icon: PropTypes.node.isRequired,
-  title: PropTypes.node.isRequired,
-  value: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
   footer: PropTypes.node,
+  onClick: PropTypes.func,
 };
 
 DeviceCard.displayName = "/src/widgets/cards/device-card.jsx";
