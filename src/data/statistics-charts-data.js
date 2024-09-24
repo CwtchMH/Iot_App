@@ -1,76 +1,84 @@
 import { chartsConfig } from "@/configs";
 
-const dailySalesChart = {
-  type: "line",
-  height: 390,
-  series: [
-    {
-      name: "Light",
-      data: [70, 40, 68, 79, 60, 26, 59, 60, 80, 60, 70, 75, 69, 80, 60, 70, 75, 69, 80, 60, 70, 75, 69, 80, 60],
+export function createStatisticsChartsData(sensorData) {
+  // Create an array of all 24 hours
+  // This line creates an array of 24 hour strings, from "00" to "23"
+  // Array.from creates a new array with 24 elements
+  // The second argument is a mapping function that converts each index to a string
+  // toString() converts the number to a string
+  // padStart(2, '0') ensures each string is 2 characters long, padding with '0' if needed
+  const allHours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+
+  // Initialize data arrays for each hour
+  const lightData = new Array(24).fill(null);
+  const temperatureData = new Array(24).fill(null);
+  const humidityData = new Array(24).fill(null);
+
+  // Process sensorData to extract light, temperature, and humidity values
+  sensorData.forEach(reading => {
+    const date = new Date(reading.createdAt);
+    const hour = date.getHours();
+    
+    lightData[hour] = reading.light;
+    temperatureData[hour] = reading.temperature;
+    humidityData[hour] = reading.humidity;
+  });
+
+  const dailySalesChart = {
+    type: "line",
+    height: 390,
+    series: [
+      {
+        name: "Light",
+        data: lightData,
+      },
+      {
+        name: "Temperature",
+        data: temperatureData,
+        color: "#ff0000",
+      },
+      {
+        name: "Humidity",
+        data: humidityData,
+        color: "#ff8b00",
+      }
+    ],
+    options: {
+      ...chartsConfig,
+      colors: ["#0288d1"],
+      stroke: {
+        curve: "smooth",
+      },
+      markers: {
+        size: 5,
+      },
+      xaxis: {
+        ...chartsConfig.xaxis,
+        categories: allHours,
+        title: {
+          text: 'Hour of Day'
+        }
+      },
+      yaxis: {
+        title: {
+          text: 'Value'
+        }
+      },
+      tooltip: {
+        x: {
+          formatter: (val) => `Hour: ${val}`
+        }
+      }
     },
+  };
+
+  return [
     {
-      name: "Temperature",
-      data: [20, 23, 25, 21, 30, 32, 37, 35, 40, 34, 30, 33, 30, 35, 40, 34, 30, 33, 30, 35, 40, 34, 30, 33, 30],
-      color: "#ff0000",
-    },
-    {
-      name: "Humidity",
-      data: [30, 40, 35, 28, 23, 12, 14, 15, 15, 13, 28, 23, 12, 14, 15, 12, 14, 15, 15, 13,28, 23, 12, 14, 15],
-      color: "#ff8b00",
+      color: "white",
+      title: "Sensor Histogram",
+      description: "#Track for the best moment",
+      footer: "updated 2 sec ago",
+      chart: dailySalesChart,
     }
-  ],
-  options: {
-    ...chartsConfig,
-    colors: ["#0288d1"],
-    stroke: {
-      curve: "smooth",
-    },
-    markers: {
-      size: 5,
-    },
-    xaxis: {
-      ...chartsConfig.xaxis,
-      categories: [
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "16",
-        "17",
-        "18",
-        "19",
-        "20",
-        "21",
-        "22",
-        "23",
-        "24",
-      ],
-    },
-  },
-};
-
-
-
-export const statisticsChartsData = [
-  {
-    color: "white",
-    title: "Sensor Histogram",
-    description: "#Track for the best moment",
-    footer: "updated 4 min ago",
-    chart: dailySalesChart,
-  }
-];
-
-export default statisticsChartsData;
+  ];
+}
