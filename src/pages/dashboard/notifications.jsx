@@ -157,7 +157,7 @@ export function Notifications() {
                           href="#"
                           className="text-xs font-semibold text-blue-gray-600"
                         >
-                          {new Date(createdAt).toLocaleString()}
+                          {createdAt}
                         </Typography>
                       </td>
                     </tr>

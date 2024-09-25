@@ -7,7 +7,7 @@ import ThermostatIcon from '@mui/icons-material/Thermostat';
 export function createStatisticsCardsData(sensorData) {
   // Assuming sensorData is an array and we want the latest reading
   const latestReading = sensorData[0] || {};
-  const hourAgoReading = sensorData[5] || {};
+  const hourAgoReading = sensorData[29] || {};
 
   return [
     {
@@ -19,7 +19,7 @@ export function createStatisticsCardsData(sensorData) {
       footer: {
         color: hourAgoReading.light > latestReading.light ? "text-red-500" : "text-green-300",
         value: hourAgoReading.light > latestReading.light ? "-" + (((hourAgoReading.light - latestReading.light) / hourAgoReading.light) * 100).toFixed(2) + "%" : "+" + (((latestReading.light - hourAgoReading.light) / hourAgoReading.light) * 100).toFixed(2) + "%",
-        label: "than last hour",
+        label: "than last minute",
       },
     },
     {
@@ -31,7 +31,7 @@ export function createStatisticsCardsData(sensorData) {
       footer: {
         color: hourAgoReading.humidity > latestReading.humidity ? "text-red-500" : "text-green-300",
         value: hourAgoReading.humidity > latestReading.humidity ? "-" + (((hourAgoReading.humidity - latestReading.humidity) / hourAgoReading.humidity) * 100).toFixed(2) + "%" : "+" + (((latestReading.humidity - hourAgoReading.humidity) / hourAgoReading.humidity) * 100).toFixed(2) + "%",
-        label: "than last hour",
+        label: "than last minute",
       },
     },
     {
@@ -43,7 +43,7 @@ export function createStatisticsCardsData(sensorData) {
       footer: {
         color: hourAgoReading.temperature > latestReading.temperature ? "text-red-500" : "text-green-300",
         value: hourAgoReading.temperature > latestReading.temperature ? "-" + (((hourAgoReading.temperature - latestReading.temperature) / hourAgoReading.temperature) * 100).toFixed(2) + "%" : "+" + (((latestReading.temperature - hourAgoReading.temperature) / hourAgoReading.temperature) * 100).toFixed(2) + "%",
-        label: "than last hour",
+        label: "than last minute",
       },
     }
   ];

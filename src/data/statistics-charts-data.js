@@ -7,24 +7,35 @@ export function createStatisticsChartsData(sensorData) {
   // The second argument is a mapping function that converts each index to a string
   // toString() converts the number to a string
   // padStart(2, '0') ensures each string is 2 characters long, padding with '0' if needed
-  const allHours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+  const allHours = Array.from({ length: 24 }, (_, i) =>
+    i.toString().padStart(2, "0"),
+  );
 
   // Initialize data arrays for each hour
   const lightData = new Array(24).fill(null);
   const temperatureData = new Array(24).fill(null);
   const humidityData = new Array(24).fill(null);
 
+  const parseDate = (dateString) => {
+    const [datePart, timePart] = dateString.split(" "); // Tách ngày và giờ
+    const [day, month, year] = datePart.split("/"); // Tách thành phần ngày
+    const [hours, minutes, seconds] = timePart.split(":"); // Tách thành phần thời gian
+
+    // Tạo đối tượng Date bằng cách sử dụng các thành phần đã tách
+    return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
+  };
+
   // Process sensorData to extract light, temperature, and humidity values
-  sensorData.forEach(reading => {
-    const date = new Date(reading.createdAt);
+  sensorData.forEach((reading) => {
+    const date = parseDate(reading.createdAt);
     const hour = date.getHours();
-    
+
     lightData[hour] = reading.light;
     temperatureData[hour] = reading.temperature;
     humidityData[hour] = reading.humidity;
   });
 
-  const dailySalesChart = {
+  const SensorChart = {
     type: "line",
     height: 390,
     series: [
@@ -41,7 +52,7 @@ export function createStatisticsChartsData(sensorData) {
         name: "Humidity",
         data: humidityData,
         color: "#ff8b00",
-      }
+      },
     ],
     options: {
       ...chartsConfig,
@@ -56,19 +67,19 @@ export function createStatisticsChartsData(sensorData) {
         ...chartsConfig.xaxis,
         categories: allHours,
         title: {
-          text: 'Hour of Day'
-        }
+          text: "Hour of Day",
+        },
       },
       yaxis: {
         title: {
-          text: 'Value'
-        }
+          text: "Value",
+        },
       },
       tooltip: {
         x: {
-          formatter: (val) => `Hour: ${val}`
-        }
-      }
+          formatter: (val) => `Hour: ${val}`,
+        },
+      },
     },
   };
 
@@ -78,7 +89,7 @@ export function createStatisticsChartsData(sensorData) {
       title: "Sensor Histogram",
       description: "#Track for the best moment",
       footer: "updated 2 sec ago",
-      chart: dailySalesChart,
-    }
+      chart: SensorChart,
+    },
   ];
 }

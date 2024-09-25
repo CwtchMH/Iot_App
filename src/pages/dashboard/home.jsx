@@ -34,9 +34,8 @@ export function Home() {
   );
 
   const handleDeviceClick = async (device) => {
-    console.log(device.footer.status)
     const newStatus = device.footer.status === "on" ? "off" : "on";
-    //mqttPublish('devices/control',JSON.stringify({ device: device.title, deviceId: device.idDevice, status: newStatus }));
+    mqttPublish(JSON.stringify({ device: device.title, deviceId: device.idDevice, status: newStatus }));
     try {
       const response = await fetch(`http://localhost:3000/devices/devices-addition`, {
         method: 'POST',

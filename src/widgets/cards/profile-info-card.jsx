@@ -26,7 +26,7 @@ export function ProfileInfoCard({ title, description, details, action }) {
             variant="small"
             className="font-normal text-blue-gray-500"
           >
-            {description}
+            {description}sfssf
           </Typography>
         )}
         {description && details ? (
@@ -48,7 +48,7 @@ export function ProfileInfoCard({ title, description, details, action }) {
                     variant="small"
                     className="font-normal text-blue-gray-500"
                   >
-                    {details[el]}
+                    {details[el]} {el === "API docs" ? <a href="https://documenter.getpostman.com/view/33158714/2sAXqwXzKG" target="_blank">API docs</a> : el === "PDF" ? <a href="https://drive.google.com/file/d/18000000000000000000000000000000/view?usp=drive_link" target="_blank">PDF</a> : ""}
                   </Typography>
                 ) : (
                   details[el]
