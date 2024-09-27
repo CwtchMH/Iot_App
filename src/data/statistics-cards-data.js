@@ -8,6 +8,7 @@ export function createStatisticsCardsData(sensorData) {
   // Assuming sensorData is an array and we want the latest reading
   const latestReading = sensorData[0] || {};
   const hourAgoReading = sensorData[29] || {};
+  console.log(latestReading.light)
 
   return [
     {
