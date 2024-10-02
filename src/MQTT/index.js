@@ -1,7 +1,7 @@
 import mqtt from 'mqtt';
 
 // Use the correct WebSocket URL and port
-const client = mqtt.connect('ws://192.168.1.20:9001/mqtt', {
+const client = mqtt.connect('ws://10.21.136.234:9001/mqtt', {
   username: 'ManhHieu',
   password: 'b21dccn364'
 });

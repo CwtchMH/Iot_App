@@ -26,7 +26,7 @@ export function ProfileInfoCard({ title, description, details, action }) {
             variant="small"
             className="font-normal text-blue-gray-500"
           >
-            {description}sfssf
+            {description}
           </Typography>
         )}
         {description && details ? (

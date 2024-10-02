@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ws from "@/Websocket"; // Import the WebSocket client
 
 export function useActiveHistoryData(searchTerm = '', searchType = '') {
   const [activeHistoryData, setActiveHistoryData] = useState([]);
   const [error, setError] = useState(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const response = await fetch(`http://localhost:3000/devices/devices-status?searchTerm=${searchTerm}&searchType=${searchType}`);
       if (!response.ok) {
@@ -18,11 +18,11 @@ export function useActiveHistoryData(searchTerm = '', searchType = '') {
       console.error("Error fetching active history data:", e);
       setError(e.message);
     }
-  };
+  },[searchTerm, searchType]);
 
   useEffect(() => {
     fetchData();
-  }, [searchTerm, searchType]);
+  }, [fetchData]);
 
   useEffect(() => {
     // Ensure WebSocket connection is open
@@ -52,7 +52,7 @@ export function useActiveHistoryData(searchTerm = '', searchType = '') {
       ws.removeEventListener('message', handleWebSocketMessage);
       // Don't close the WebSocket here, as it might be used by other components
     };
-  }, []);
+  }, [fetchData]);
 
   return { activeHistoryData, error, setActiveHistoryData };
 }

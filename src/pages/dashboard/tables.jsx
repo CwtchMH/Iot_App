@@ -30,12 +30,14 @@ export function Tables() {
   }, [currentPage, pageSize, sortedData]);
 
   const requestSort = (key) => {
+      if (key === 'time') {
+        key = 'createdAt'
+      }
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
     setSortConfig({ key, direction });
-
     const sortedPageData = [...currentTableData].sort((a, b) => {
       if (a[key] < b[key]) return direction === 'ascending' ? -1 : 1;
       if (a[key] > b[key]) return direction === 'ascending' ? 1 : -1;

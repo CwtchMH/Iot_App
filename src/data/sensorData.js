@@ -35,7 +35,6 @@ export function useSensorData(searchTerm = "", searchType = "") {
       const data = JSON.parse(event.data);
       console.log("WebSocket message received:", data);
       if (data.type === "SENSOR_CREATE") {
-        console.log("searchTerm:", searchTerm, "searchType:", searchType);
         fetchData();
         console.log("Device update received, fetching new data");
       }
