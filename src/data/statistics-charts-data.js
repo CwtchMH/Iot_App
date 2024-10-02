@@ -1,30 +1,43 @@
 import { chartsConfig } from "@/configs";
+import { useEffect } from "react";
 
 export function createStatisticsChartsData(sensorData) {
-  // Create an array of all 24 hours
-  // This line creates an array of 24 hour strings, from "00" to "23"
-  // Array.from creates a new array with 24 elements
-  // The second argument is a mapping function that converts each index to a string
-  // toString() converts the number to a string
-  // padStart(2, '0') ensures each string is 2 characters long, padding with '0' if needed
-  const allHours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+  // Khởi tạo dữ liệu cho mỗi cảm biến
+  const lightData = [];
+  const temperatureData = [];
+  const humidityData = [];
+  const timePoints = [];
 
-  // Initialize data arrays for each hour
-  const lightData = new Array(24).fill(null);
-  const temperatureData = new Array(24).fill(null);
-  const humidityData = new Array(24).fill(null);
+  // Hàm phân tích chuỗi ngày giờ
+  const parseDate = (dateString) => {
+    const [datePart, timePart] = dateString.split(" ");
+    const [day, month, year] = datePart.split("/");
+    const [hours, minutes, seconds] = timePart.split(":");
+    return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
+  };
 
-  // Process sensorData to extract light, temperature, and humidity values
-  sensorData.forEach(reading => {
-    const date = new Date(reading.createdAt);
-    const hour = date.getHours();
-    
-    lightData[hour] = reading.light;
-    temperatureData[hour] = reading.temperature;
-    humidityData[hour] = reading.humidity;
+  // Xử lý dữ liệu cảm biến
+  const newArr = [...sensorData].reverse();
+  newArr.forEach((reading) => {
+    const date = parseDate(reading.createdAt); // Phân tích ngày giờ
+    const timeLabel = reading.createdAt.slice(11); // Chuyển đổi thành chuỗi thời gian
+
+    // Thêm dữ liệu vào mảng
+    lightData.push(reading.light);
+    temperatureData.push(reading.temperature);
+    humidityData.push(reading.humidity);
+    timePoints.push(timeLabel);
+
+    // Giới hạn số lượng dữ liệu chỉ giữ lại 12 mục mới nhất
+    if (lightData.length > 12) {
+      lightData.shift(); // Xóa mục đầu tiên
+      temperatureData.shift(); // Xóa mục đầu tiên
+      humidityData.shift(); // Xóa mục đầu tiên
+      timePoints.shift(); // Xóa mục đầu tiên
+    }
   });
 
-  const dailySalesChart = {
+  const SensorChart = {
     type: "line",
     height: 390,
     series: [
@@ -41,11 +54,11 @@ export function createStatisticsChartsData(sensorData) {
         name: "Humidity",
         data: humidityData,
         color: "#ff8b00",
-      }
+      },
     ],
     options: {
       ...chartsConfig,
-      colors: ["#0288d1"],
+      colors: ["#0288d1", "#ff0000", "#ff8b00"],
       stroke: {
         curve: "smooth",
       },
@@ -54,31 +67,31 @@ export function createStatisticsChartsData(sensorData) {
       },
       xaxis: {
         ...chartsConfig.xaxis,
-        categories: allHours,
+        categories: timePoints, // Sử dụng thời gian thực tế
         title: {
-          text: 'Hour of Day'
-        }
+          text: "Time",
+        },
       },
       yaxis: {
         title: {
-          text: 'Value'
-        }
+          text: "Value",
+        },
       },
       tooltip: {
         x: {
-          formatter: (val) => `Hour: ${val}`
-        }
-      }
+          formatter: (val) => `Time: ${val}`,
+        },
+      },
     },
   };
 
   return [
     {
       color: "white",
-      title: "Sensor Histogram",
-      description: "#Track for the best moment",
-      footer: "updated 2 sec ago",
-      chart: dailySalesChart,
-    }
+      title: "Sensor Live Data",
+      description: "Live tracking of sensor data every 5 seconds.",
+      footer: "updated recently",
+      chart: SensorChart,
+    },
   ];
 }

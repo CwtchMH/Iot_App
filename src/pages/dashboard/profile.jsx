@@ -90,7 +90,7 @@ export function Profile() {
             </div>
             <div className="">
               <ProfileInfoCard
-                title="Documents"
+                title="Documents about project"
                 details={{
                   "API docs": "",
                   PDF: "",

@@ -17,7 +17,6 @@ import { useSearch } from '@/context/SearchContext';
 export function Notifications() {
   const { searchTerm, searchType } = useSearch();
   const { activeHistoryData, error } = useActiveHistoryData(searchTerm, searchType);
-
   const [sortedData, setSortedData] = useState([]);
   const [sortConfig, setSortConfig] = useState({
     key: null,
@@ -30,19 +29,28 @@ export function Notifications() {
     setSortedData([...activeHistoryData]);
   }, [activeHistoryData]);
 
+
   const currentTableData = useMemo(() => {
     const firstPageIndex = (currentPage - 1) * pageSize;
     const lastPageIndex = firstPageIndex + pageSize;
     return sortedData.slice(firstPageIndex, lastPageIndex);
   }, [currentPage, pageSize, sortedData]);
 
+
   const requestSort = (key) => {
+    if (key === "deviceid") {
+      key = "deviceId"
+    }
+    else {
+      if (key === 'time') {
+        key = 'createdAt'
+      }
+    }
     let direction = "ascending";
     if (sortConfig.key === key && sortConfig.direction === "ascending") {
       direction = "descending";
     }
     setSortConfig({ key, direction });
-
     const sorted = [...currentTableData].sort((a, b) => {
       if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
       if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
@@ -112,7 +120,7 @@ export function Notifications() {
             <tbody>
               {currentTableData.map(
                 (
-                  { _id, id, device, deviceId, status, createdAt },
+                  { _id, id, device, deviceId, status, createdAt, createdAtDate },
                   key,
                 ) => {
                   const className = `py-3 px-10 ${
@@ -157,7 +165,7 @@ export function Notifications() {
                           href="#"
                           className="text-xs font-semibold text-blue-gray-600"
                         >
-                          {new Date(createdAt).toLocaleString()}
+                          {createdAtDate}
                         </Typography>
                       </td>
                     </tr>
