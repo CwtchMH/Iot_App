@@ -161,7 +161,6 @@ export function Notifications() {
                       </td>
                       <td className={className}>
                         <Typography
-                          as="a"
                           href="#"
                           className="text-xs font-semibold text-blue-gray-600"
                         >

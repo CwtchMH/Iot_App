@@ -5,9 +5,10 @@ const SearchContext = createContext();
 export const SearchProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('');
+  const [signal, setSignal] = useState('')
 
   return (
-    <SearchContext.Provider value={{ searchTerm, setSearchTerm, searchType, setSearchType }}>
+    <SearchContext.Provider value={{ signal, setSignal, searchTerm, setSearchTerm, searchType, setSearchType }}>
       {children}
     </SearchContext.Provider>
   );

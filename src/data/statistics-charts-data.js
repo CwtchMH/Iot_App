@@ -7,6 +7,7 @@ export function createStatisticsChartsData(sensorData) {
   const temperatureData = [];
   const humidityData = [];
   const timePoints = [];
+  const random = [];
 
   // Hàm phân tích chuỗi ngày giờ
   const parseDate = (dateString) => {
@@ -27,6 +28,7 @@ export function createStatisticsChartsData(sensorData) {
     temperatureData.push(reading.temperature);
     humidityData.push(reading.humidity);
     timePoints.push(timeLabel);
+    random.push(reading.random);
 
     // Giới hạn số lượng dữ liệu chỉ giữ lại 12 mục mới nhất
     if (lightData.length > 12) {
@@ -34,6 +36,7 @@ export function createStatisticsChartsData(sensorData) {
       temperatureData.shift(); // Xóa mục đầu tiên
       humidityData.shift(); // Xóa mục đầu tiên
       timePoints.shift(); // Xóa mục đầu tiên
+      random.shift();
     }
   });
 
@@ -54,6 +57,11 @@ export function createStatisticsChartsData(sensorData) {
         name: "Humidity",
         data: humidityData,
         color: "#ff8b00",
+      },
+      {
+        name: "Random",
+        data: random,
+        color: "#ff8b01",
       },
     ],
     options: {

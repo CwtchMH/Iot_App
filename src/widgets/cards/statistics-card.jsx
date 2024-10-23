@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 
 export function StatisticsCard({ color, colorBg, icon, title, value, footer }) {
   return (
-    <Card className={`border bg-${colorBg} border-blue-gray-100 shadow-md`}>
+    <Card className={`border bg-${colorBg} w-62 border-blue-gray-100 shadow-md`}>
       <CardHeader
         variant="gradient"
         color={color}

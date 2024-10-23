@@ -10,10 +10,15 @@ import {
 import { useSensorData } from "@/data/sensorData";
 import { useActiveHistoryData } from "@/data/active-history-data";
 import { mqttPublish } from "@/MQTT";
+import { client } from "@/MQTT";
 
 export function Home() {
   const { sensorData, error: sensorError } = useSensorData();
-  const { activeHistoryData, error: activeHistoryError, setActiveHistoryData } = useActiveHistoryData();
+  const {
+    activeHistoryData,
+    error: activeHistoryError,
+    setActiveHistoryData,
+  } = useActiveHistoryData();
 
   // Create statistics cards data based on sensor data
   const statisticsCardsData = React.useMemo(
@@ -29,32 +34,57 @@ export function Home() {
 
   // Create device cards data based on activeHistoryData
   const deviceCardsData = React.useMemo(
-    () => createDeviceCardsData(activeHistoryData),
-    [activeHistoryData],
+    () => createDeviceCardsData(activeHistoryData, sensorData),
+    [activeHistoryData, sensorData],
   );
 
-  const handleDeviceClick = async (device) => {
+  const handleDeviceClick = (device) => {
     const newStatus = device.footer.status === "on" ? "off" : "on";
-    mqttPublish(JSON.stringify({ device: device.title, deviceId: device.idDevice, status: newStatus }));
-    try {
-      const response = await fetch(`http://localhost:3000/devices/devices-addition`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ device: device.title, deviceId: device.idDevice, status: newStatus }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  
+    // Gửi tin nhắn MQTT để điều khiển thiết bị
+    mqttPublish(
+      JSON.stringify({
+        device: device.title,
+        deviceId: device.idDevice,
+        status: newStatus,
+      })
+    );
+  
+    // Lắng nghe phản hồi từ MQTT (xử lý trong callback của MQTT)
+    client.on("message", (topic, message) => {
+      const incomingMessage = message.toString();
+      
+      // Giả sử tin nhắn "ok" sẽ được gửi về sau khi thiết bị bật/tắt thành công
+      if (topic === "devices/control" && incomingMessage === "ok") {
+  
+        // Gửi yêu cầu POST lên backend để cập nhật cơ sở dữ liệu
+        fetch("http://localhost:3000/devices/devices-addition", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            device: device.title,
+            deviceId: device.idDevice,
+            status: newStatus,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Device status updated successfully:", data);
+          })
+          .catch((error) => {
+            console.error("Error updating device status:", error);
+          });
       }
-
-      const data = await response.json();
-      console.log('Device status updated successfully:', data);
-    } catch (error) {
-      console.error('Error updating device status:', error);
-    }
+    });
   };
+  
 
   if (sensorError || activeHistoryError) {
     return <div>Error: {sensorError || activeHistoryError}</div>;
@@ -62,7 +92,7 @@ export function Home() {
 
   return (
     <div className="mt-3">
-      <div className="mb-6 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mb-6 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
             key={title}
@@ -113,7 +143,9 @@ export function Home() {
               })}
               footer={
                 <Typography className="font-normal text-blue-gray-600">
-                  <strong className={device.footer.color}>{device.footer.label}</strong>
+                  <strong className={device.footer.color}>
+                    {device.footer.label}
+                  </strong>
                   &nbsp;{device.footer.status.toUpperCase()}
                 </Typography>
               }

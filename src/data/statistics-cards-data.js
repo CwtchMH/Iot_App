@@ -8,7 +8,6 @@ export function createStatisticsCardsData(sensorData) {
   // Assuming sensorData is an array and we want the latest reading
   const latestReading = sensorData[0] || {};
   const hourAgoReading = sensorData[29] || {};
-  console.log(latestReading.light)
 
   return [
     {
@@ -44,6 +43,18 @@ export function createStatisticsCardsData(sensorData) {
       footer: {
         color: hourAgoReading.temperature > latestReading.temperature ? "text-red-500" : "text-green-300",
         value: hourAgoReading.temperature > latestReading.temperature ? "-" + (((hourAgoReading.temperature - latestReading.temperature) / hourAgoReading.temperature) * 100).toFixed(2) + "%" : "+" + (((latestReading.temperature - hourAgoReading.temperature) / hourAgoReading.temperature) * 100).toFixed(2) + "%",
+        label: "than last minute",
+      },
+    },
+    {
+      color: "orange",
+      colorBg: latestReading.random > 75 ? "orange-600" : latestReading.random > 50 ? "orange-300" : latestReading.random > 25 ? "orange-200" : "orange-100",
+      icon: ThermostatIcon,
+      title: "RandomSensor",
+      value: `${latestReading.random || 0}`,
+      footer: {
+        color: hourAgoReading.random > latestReading.random ? "text-red-500" : "text-green-300",
+        value: hourAgoReading.random > latestReading.random ? "-" + (((hourAgoReading.random - latestReading.random) / hourAgoReading.random) * 100).toFixed(2) + "%" : "+" + (((latestReading.random - hourAgoReading.random) / hourAgoReading.random) * 100).toFixed(2) + "%",
         label: "than last minute",
       },
     }

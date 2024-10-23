@@ -87,7 +87,7 @@ export function Tables() {
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>
-                {["id", "temperature", "humidity", "light", "time"].map((el) => (
+                {["id", "temperature", "humidity", "light", "light2", "time"].map((el) => (
                   <th
                     key={el}
                     className="border-b border-blue-gray-50 py-3 px-10 text-left cursor-pointer"
@@ -105,7 +105,7 @@ export function Tables() {
             </thead>
             <tbody>
               {currentTableData.map(
-                ({ _id, id, temperature, humidity, light, createdAt }, key) => {
+                ({ _id, id, temperature, humidity, light, random, createdAt }, key) => {
                   const className = `py-3 px-10 ${
                     key === currentTableData.length - 1
                       ? ""
@@ -141,8 +141,12 @@ export function Tables() {
                         </Typography>
                       </td>
                       <td className={className}>
+                        <Typography className="text-xs font-bold text-black">
+                          {random}
+                        </Typography>
+                      </td>
+                      <td className={className}>
                         <Typography
-                          as="a"
                           href="#"
                           className="text-xs font-semibold text-blue-gray-600"
                         >

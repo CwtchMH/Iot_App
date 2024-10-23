@@ -20,6 +20,10 @@ module.exports = withMT({
        'bg-yellow-200',
        'bg-yellow-400',
        'bg-yellow-700',
+       'bg-orange-600',
+       'bg-orange-400',
+       'bg-orange-200',
+       'bg-orange-100',
        
        // ... add other colors you need
      ],
